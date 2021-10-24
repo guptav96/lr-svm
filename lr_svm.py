@@ -6,6 +6,7 @@ warnings.filterwarnings('ignore')
 
 import numpy as np
 import pandas as pd
+# np.set_printoptions(precision=16)
 
 lr_options = {
 	'lambda': 0.01,
@@ -22,7 +23,8 @@ svm_options = {
 }
 
 def logistic(x):
-	return 1/(1+np.exp(-x))
+	# default is also float64
+	return 1./(1+np.exp(-x)).astype(np.float64)
 
 def l2_norm(x):
 	return np.linalg.norm(x.ravel(), ord=2)
@@ -54,7 +56,7 @@ def lr(train_df, test_df):
 	# initialize weights to zeros
 	weights = np.zeros((train_X.shape[1], 1))
 
-	# training
+	# training by gradient descent
 	for _ in range(lr_options['max_iter']):
 		pred_y = logistic(np.dot(train_X, weights))
 		grad_ = np.dot(train_X.T , (pred_y - train_y)) + lr_options['lambda'] * weights
@@ -80,19 +82,18 @@ def lr(train_df, test_df):
 
 def svm(train_df, test_df):
 	train_X, train_y, test_X, test_y = process(train_df, test_df)
-	#change labels to -1 and 1 for SVM
+	# change labels to -1 and 1 for SVM
 	train_y = np.where(train_y == 0, -1, 1)
-	test_y = np.where(test_y == 0, -1, 1)
 	N = train_X.shape[0]
 
 	# initialize weights to zeros
 	weights = np.zeros((train_X.shape[1], 1))
 
-	# training
+	# training by sub-gradient descent
 	for _ in range(svm_options['max_iter']):
 		pred_y = np.dot(train_X, weights)
 		mask = train_y * pred_y
-		delta = np.where(mask >= 1, 0, train_y * train_X)
+		delta = np.where(mask < 1, train_y * train_X, 0)
 		grad_ = 1./N * (svm_options['lambda'] * N * weights - np.sum(delta, axis = 0).reshape(-1,1))
 		# check if diff in weight norm is more than tol
 		delta_w = svm_options['step_size'] * grad_
@@ -102,10 +103,12 @@ def svm(train_df, test_df):
 
 	# testing
 	pred_test_y = np.dot(test_X, weights)
-	pred_test_y = np.where(pred_test_y > 0, 1, -1)
+	pred_test_y = np.where(pred_test_y > 0, 1, 0)
 
+	# change labels back to original labels
+	train_y = np.where(train_y == -1, 0, 1)
 	pred_train_y = np.dot(train_X, weights)
-	pred_train_y = np.where(pred_train_y > 0, 1, -1)
+	pred_train_y = np.where(pred_train_y > 0, 1, 0)
 
 	# print(np.unique(pred_train_y, return_counts = True))
 	# print(np.unique(pred_test_y, return_counts = True))
