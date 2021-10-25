@@ -1,4 +1,5 @@
 """Naive Bayes Classifier Implementation"""
+
 import pandas as pd
 import numpy as np
 

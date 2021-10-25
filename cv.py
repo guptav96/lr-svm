@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import math
+from scipy import stats
 import matplotlib.pyplot as plt
 
 from lr_svm import lr, svm
@@ -43,14 +44,14 @@ def run_models(model_idx, S, t_fracs):
 	return accuracy_frac_dict, std_error_frac_dict
 
 def plot_curves(nbc_acc_dict, nbc_err_dict, lr_acc_dict, lr_err_dict, svm_acc_dict, svm_err_dict):
-	plt.errorbar(nbc_acc_dict.keys(), nbc_acc_dict.values(), yerr = nbc_err_dict.values(), label='NBC')
-	plt.errorbar(lr_acc_dict.keys(), lr_acc_dict.values(), yerr = lr_err_dict.values(), label='LR')
-	plt.errorbar(svm_acc_dict.keys(), svm_acc_dict.values(), yerr = svm_err_dict.values(), label='SVM')
+	plt.errorbar(list(nbc_acc_dict.keys()), list(nbc_acc_dict.values()), yerr = list(nbc_err_dict.values()), marker='o', label='NBC')
+	plt.errorbar(list(lr_acc_dict.keys()), list(lr_acc_dict.values()), yerr = list(lr_err_dict.values()), marker='o', label='LR')
+	plt.errorbar(list(svm_acc_dict.keys()), list(svm_acc_dict.values()), yerr = list(svm_err_dict.values()), marker='o', label='SVM')
 	plt.legend(loc='upper left')
 	plt.xlabel('Size of the training set')
 	plt.ylabel('Model Accuracy and Standard Error')
 	plt.title('Learning Curves for each model: NBC, LR and SVM')
-	plt.style.use('seaborn-whitegrid')
+	plt.grid(True, linestyle='--', linewidth=0.5)
 	plt.show()
 
 if __name__ == '__main__':
@@ -65,5 +66,7 @@ if __name__ == '__main__':
 	nbc_acc_dict, nbc_err_dict = run_models(0, S_nbc, t_fracs) # train and test NBC
 	lr_acc_dict, lr_err_dict = run_models(1, S, t_fracs) # train and test LR
 	svm_acc_dict, svm_err_dict = run_models(2, S, t_fracs) # train and test SVM
-	# part(iii)
 	plot_curves(nbc_acc_dict, nbc_err_dict, lr_acc_dict, lr_err_dict, svm_acc_dict, svm_err_dict)
+	# testing the hypothesis
+	# t_val, p_val = stats.ttest_rel(list(lr_acc_dict.values()), list(svm_acc_dict.values()), alternative='greater')
+	# print(f't-statistic: {t_val} p-value: {p_val}')
