@@ -3,7 +3,7 @@ Logistic Regression and SVM implementation for a dating dataset, and comparison 
 
 *Python Commands:*
 
-Preprocess the dating dataset for LR and SVM classification: ```python preprocess-assgn3.py```
+Preprocess the dating dataset for LR and SVM classification: ```python preprocess-assg3.py```
 
 Train and Test LR Model: ```python lr_svm.py trainingSet.csv testSet.csv 1```
 
